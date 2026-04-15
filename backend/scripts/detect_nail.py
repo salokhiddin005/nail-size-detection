@@ -86,7 +86,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-from backend.config import MODEL_PATH, NAIL_CONF, NAIL_IOU, NAIL_IMGSZ, NAIL_CLASS_ID
+from config import MODEL_PATH, NAIL_CONF, NAIL_IOU, NAIL_IMGSZ, NAIL_CLASS_ID
 
 
 _model = None

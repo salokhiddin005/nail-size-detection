@@ -86,7 +86,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-from backend.config import CARD_MODEL_PATH, CARD_CONF, CARD_IOU, CARD_IMGSZ, CARD_CLASS_ID
+from config import CARD_MODEL_PATH, CARD_CONF, CARD_IOU, CARD_IMGSZ, CARD_CLASS_ID
 
 
 _model = None

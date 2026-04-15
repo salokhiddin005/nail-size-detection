@@ -3,7 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from backend.config import CARD_WIDTH_MM, CARD_HEIGHT_MM
+from config import CARD_WIDTH_MM, CARD_HEIGHT_MM
 from scripts.utils_edges import (
     ensure_dir,
     save_image,
