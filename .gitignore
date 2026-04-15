@@ -1,0 +1,26 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Backend
+backend/.env
+backend/__pycache__/
+backend/scripts/__pycache__/
+
+# Frontend
+frontend/.env.local
+frontend/node_modules/
+frontend/.next/
+
+# Local generated/test files
+backend/outputs/
+backend/inputs/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+backend/storage/
+backend/outputs/
+backend/inputs/
