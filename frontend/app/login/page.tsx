@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -9,7 +10,6 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,71 +18,75 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        throw error;
-      }
+    setLoading(false);
 
-      router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Login failed.");
-    } finally {
-      setLoading(false);
+    if (error) {
+      setError(error.message);
+      return;
     }
+
+    router.push("/dashboard");
   };
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-white">
-      <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-        <h1 className="text-3xl font-semibold">Log in</h1>
-        <p className="mt-2 text-sm text-white/60">
-          Access your personal dashboard and gallery.
+    <main className="min-h-screen bg-black px-6 py-12 text-white">
+      <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+        <h1 className="mb-2 text-3xl font-semibold">Log in</h1>
+        <p className="mb-6 text-sm text-white/60">
+          Log in to continue to Nailytics.
         </p>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm text-white/70">Email</label>
+            <label className="mb-2 block text-sm text-white/80">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none"
               placeholder="you@example.com"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none ring-0 placeholder:text-white/30"
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-white/70">Password</label>
+            <label className="mb-2 block text-sm text-white/80">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none"
               placeholder="Your password"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none ring-0 placeholder:text-white/30"
+              required
             />
           </div>
+
+          {error ? (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {error}
+            </div>
+          ) : null}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-pink-500 px-4 py-3 font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-xl bg-white px-4 py-3 font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
 
-        {error && (
-          <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
-          </p>
-        )}
+        <p className="mt-6 text-sm text-white/60">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="text-white underline underline-offset-4">
+            Sign up
+          </Link>
+        </p>
       </div>
     </main>
   );
