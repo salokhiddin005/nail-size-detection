@@ -38,7 +38,7 @@ export default function LoginPage() {
       <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
         <h1 className="mb-2 text-3xl font-semibold">Log in</h1>
         <p className="mb-6 text-sm text-white/60">
-          Log in to continue to Nailytics.
+          Log in to access the full website.
         </p>
 
         <form onSubmit={handleLogin} className="space-y-4">

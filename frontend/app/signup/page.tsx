@@ -8,9 +8,9 @@ import { supabase } from "@/lib/supabase";
 export default function SignupPage() {
   const router = useRouter();
 
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -46,7 +46,7 @@ export default function SignupPage() {
       <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
         <h1 className="mb-2 text-3xl font-semibold">Create account</h1>
         <p className="mb-6 text-sm text-white/60">
-          Sign up before using Nailytics.
+          Sign up first, then log in to access the full website.
         </p>
 
         <form onSubmit={handleSignup} className="space-y-4">

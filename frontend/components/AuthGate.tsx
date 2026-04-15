@@ -30,13 +30,11 @@ export default function AuthGate({
       const session = data.session;
       const isPublic = PUBLIC_ROUTES.includes(pathname);
 
-      // Not logged in → only allow login/signup
       if (!session && !isPublic) {
         router.replace("/signup");
         return;
       }
 
-      // Logged in → allow whole site, only block auth pages
       if (session && isPublic) {
         router.replace("/");
         return;
@@ -59,7 +57,10 @@ export default function AuthGate({
 
       if (session && isPublic) {
         router.replace("/");
+        return;
       }
+
+      setReady(true);
     });
 
     return () => {
