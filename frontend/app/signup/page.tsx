@@ -36,8 +36,6 @@ export default function SignupPage() {
       return;
     }
 
-    // If email confirmation is enabled, user may not be logged in yet.
-    // We still send them to login.
     if (data.user) {
       router.push("/login");
     }
@@ -59,7 +57,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none ring-0 placeholder:text-white/30"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
               required
             />
           </div>
@@ -71,7 +69,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none ring-0 placeholder:text-white/30"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
               required
             />
           </div>
@@ -83,7 +81,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a password"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none ring-0 placeholder:text-white/30"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
               required
               minLength={6}
             />

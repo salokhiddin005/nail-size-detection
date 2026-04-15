@@ -30,15 +30,15 @@ export default function AuthGate({
       const session = data.session;
       const isPublic = PUBLIC_ROUTES.includes(pathname);
 
-      // 🚫 NOT LOGGED IN → FORCE SIGNUP
+      // Not logged in → only allow login/signup
       if (!session && !isPublic) {
         router.replace("/signup");
         return;
       }
 
-      // ✅ LOGGED IN → BLOCK LOGIN/SIGNUP PAGES
+      // Logged in → allow whole site, only block auth pages
       if (session && isPublic) {
-        router.replace("/dashboard");
+        router.replace("/");
         return;
       }
 
@@ -47,23 +47,20 @@ export default function AuthGate({
 
     checkSession();
 
-    // 🔁 listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event: any, session: any) => {
-        const isPublic = PUBLIC_ROUTES.includes(pathname);
+    } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+      const isPublic = PUBLIC_ROUTES.includes(pathname);
 
-        if (!session && !isPublic) {
-          router.replace("/signup");
-          return;
-        }
-
-        if (session && isPublic) {
-          router.replace("/dashboard");
-        }
+      if (!session && !isPublic) {
+        router.replace("/signup");
+        return;
       }
-    );
+
+      if (session && isPublic) {
+        router.replace("/");
+      }
+    });
 
     return () => {
       mounted = false;
