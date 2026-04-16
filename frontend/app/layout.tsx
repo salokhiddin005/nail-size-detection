@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Nailytics",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthGate>{children}</AuthGate>
+        <AuthGate>
+          <Navbar />
+          {children}
+        </AuthGate>
       </body>
     </html>
   );
