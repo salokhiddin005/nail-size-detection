@@ -23,6 +23,11 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+          style={{ backgroundImage: 'url("/bg.jpg")' }}
+        />
+        <div className="absolute inset-0 bg-black/70" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(139,92,246,0.10),transparent_24%)]" />
 
         <div className="relative mx-auto flex min-h-screen max-w-7xl items-center px-6 py-16">
