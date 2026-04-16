@@ -57,6 +57,7 @@ export default function Navbar() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const hiddenPaths = ["/login", "/signup", "/forgot-password", "/reset-password"];
   const shouldHideNavbar = hiddenPaths.includes(pathname);
@@ -81,25 +82,27 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      setLoggingOut(true);
+      await supabase.auth.signOut();
+      router.push("/login");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
-  if (loading) return null;
-
-  if (shouldHideNavbar) return null;
-
-  if (!isLoggedIn) return null;
+  if (loading || shouldHideNavbar || !isLoggedIn) return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
-      <div className="relative mx-auto flex max-w-7xl items-center px-6 py-5">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-2 text-white">
           <Sparkles className="h-5 w-5 text-pink-400" />
           <span className="text-2xl font-semibold">Nailytics</span>
         </Link>
 
-        <nav className="absolute left-1/2 flex -translate-x-1/2 items-center gap-8 text-sm text-white/80">
+        <nav className="hidden items-center gap-8 text-sm text-white/80 md:flex">
           <Link href="/how-it-works" className="transition hover:text-white">
             How it works
           </Link>
@@ -128,14 +131,13 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        <div className="ml-auto translate-x-16">
-          <button
-            onClick={handleLogout}
-            className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-red-300 transition hover:bg-red-500/25 hover:text-red-200"
-          >
-            Log out
-          </button>
-        </div>
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/25 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loggingOut ? "Logging out..." : "Log out"}
+        </button>
       </div>
     </header>
   );
