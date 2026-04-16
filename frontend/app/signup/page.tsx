@@ -19,26 +19,41 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
 
+    const cleanName = fullName.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: cleanName,
         },
       },
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       setError(error.message);
       return;
     }
 
     if (data.user) {
-      router.push("/login");
+      const { error: profileError } = await supabase.from("profiles").upsert({
+        id: data.user.id,
+        full_name: cleanName,
+        email: cleanEmail,
+      });
+
+      if (profileError) {
+        setLoading(false);
+        setError(profileError.message);
+        return;
+      }
     }
+
+    setLoading(false);
+    router.push("/login");
   };
 
   return (
