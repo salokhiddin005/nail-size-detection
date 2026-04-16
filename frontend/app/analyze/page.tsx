@@ -217,6 +217,9 @@ const ERROR_TITLES: Record<string, string> = {
   unauthorized: "Please log in",
 };
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 export default function AnalyzePage() {
   const [tab, setTab] = useState<"upload" | "camera">("upload");
   const [stage, setStage] = useState<Stage>("idle");
@@ -247,7 +250,7 @@ export default function AnalyzePage() {
       fd.append("image", targetFile);
       fd.append("source", tab === "camera" ? "webcam" : "upload");
 
-      const res = await fetch("http://127.0.0.1:8000/api/analyze", {
+      const res = await fetch(`${API_URL}/api/analyze`, {
         method: "POST",
         body: fd,
         headers: {
