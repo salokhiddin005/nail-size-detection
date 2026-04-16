@@ -44,14 +44,35 @@ export default function DashboardPage() {
           return;
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("full_name")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Profile fetch error:", profileError.message);
+        }
 
         if (profile?.full_name) {
           setUserName(profile.full_name);
+        } else {
+          const fallbackName =
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User";
+
+          setUserName(fallbackName);
+
+          const { error: upsertError } = await supabase.from("profiles").upsert({
+            id: user.id,
+            full_name: fallbackName,
+            email: user.email,
+          });
+
+          if (upsertError) {
+            console.error("Profile upsert error:", upsertError.message);
+          }
         }
 
         const { data, error } = await supabase
@@ -87,7 +108,6 @@ export default function DashboardPage() {
 
       if (error) throw error;
 
-      // remove from UI instantly
       setResults((prev) => prev.filter((item) => item.id !== id));
     } catch (err: any) {
       alert(err.message || "Failed to delete result.");
