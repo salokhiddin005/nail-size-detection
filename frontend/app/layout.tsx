@@ -15,10 +15,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-black text-white">
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15"
+            style={{ backgroundImage: 'url("/bg.jpg")' }}
+          />
+          <div className="absolute inset-0 bg-black/70" />
+        </div>
+
         <AuthGate>
           <Navbar />
-          {children}
+          <div className="relative z-10">{children}</div>
         </AuthGate>
       </body>
     </html>
