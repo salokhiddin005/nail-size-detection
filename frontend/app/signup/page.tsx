@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import AuthBackground from "@/components/AuthBackground";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -57,8 +58,9 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black px-6 py-12 text-white">
-      <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+    <main className="relative min-h-screen px-6 py-12 text-white">
+      <AuthBackground />
+      <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <h1 className="mb-2 text-3xl font-semibold">Create account</h1>
         <p className="mb-6 text-sm text-white/60">
           Sign up first, then log in to access the full website.

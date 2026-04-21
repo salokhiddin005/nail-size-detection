@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import AuthBackground from "@/components/AuthBackground";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,8 +35,9 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black px-6 py-12 text-white">
-      <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+    <main className="relative min-h-screen px-6 py-12 text-white">
+      <AuthBackground />
+      <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <h1 className="mb-2 text-3xl font-semibold">Log in</h1>
         <p className="mb-6 text-sm text-white/60">
           Log in to access the full website.
@@ -55,7 +57,15 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-white/80">Password</label>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="block text-sm text-white/80">Password</label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-white/70 underline underline-offset-4 hover:text-white"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               value={password}
