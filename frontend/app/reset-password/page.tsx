@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import AuthBackground from "@/components/AuthBackground";
+import PasswordStrengthMeter, {
+  evaluatePassword,
+} from "@/components/PasswordStrength";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -48,8 +51,9 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    const passwordCheck = evaluatePassword(password);
+    if (!passwordCheck.valid) {
+      setError(`Password needs ${passwordCheck.issues.join(", ")}.`);
       return;
     }
 
@@ -134,8 +138,9 @@ export default function ResetPasswordPage() {
                 placeholder="New password"
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
                 required
-                minLength={6}
+                minLength={8}
               />
+              <PasswordStrengthMeter password={password} />
             </div>
 
             <div>
@@ -149,7 +154,7 @@ export default function ResetPasswordPage() {
                 placeholder="Re-enter new password"
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
 

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AuthBackground from "@/components/AuthBackground";
+import PasswordStrengthMeter, {
+  evaluatePassword,
+} from "@/components/PasswordStrength";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -16,8 +19,15 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    const passwordCheck = evaluatePassword(password);
+    if (!passwordCheck.valid) {
+      setError(`Password needs ${passwordCheck.issues.join(", ")}.`);
+      return;
+    }
+
+    setLoading(true);
 
     const cleanName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
@@ -103,8 +113,9 @@ export default function SignupPage() {
                 placeholder="Create a password"
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
                 required
-                minLength={6}
+                minLength={8}
               />
+              <PasswordStrengthMeter password={password} />
             </div>
 
             {error ? (
