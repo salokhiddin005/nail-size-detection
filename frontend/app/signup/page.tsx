@@ -2,18 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import AuthBackground from "@/components/AuthBackground";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +21,7 @@ export default function SignupPage() {
 
     const cleanName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
+    const emailRedirectTo = `${window.location.origin}/login`;
 
     const { data, error } = await supabase.auth.signUp({
       email: cleanEmail,
@@ -30,6 +30,7 @@ export default function SignupPage() {
         data: {
           full_name: cleanName,
         },
+        emailRedirectTo,
       },
     });
 
@@ -47,14 +48,13 @@ export default function SignupPage() {
       });
 
       if (profileError) {
-        setLoading(false);
-        setError(profileError.message);
-        return;
+        console.warn("Profile upsert failed (non-fatal):", profileError.message);
       }
     }
 
+    setSentEmail(cleanEmail);
+    setSent(true);
     setLoading(false);
-    router.push("/login");
   };
 
   return (
@@ -63,61 +63,77 @@ export default function SignupPage() {
       <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
         <h1 className="mb-2 text-3xl font-semibold">Create account</h1>
         <p className="mb-6 text-sm text-white/60">
-          Sign up first, then log in to access the full website.
+          Sign up to access the full website.
         </p>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div>
-            <label className="mb-2 block text-sm text-white/80">Full name</label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Your name"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm text-white/80">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm text-white/80">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
-              required
-              minLength={6}
-            />
-          </div>
-
-          {error ? (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-              {error}
+        {sent ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+              Check your inbox. We sent a verification link to{" "}
+              <span className="font-medium">{sentEmail}</span>. Click it to
+              activate your account, then log in.
             </div>
-          ) : null}
+            <Link
+              href="/login"
+              className="inline-block text-sm text-white underline underline-offset-4"
+            >
+              Back to log in
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div>
+              <label className="mb-2 block text-sm text-white/80">Full name</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your name"
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-white px-4 py-3 font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading ? "Creating account..." : "Sign up"}
-          </button>
-        </form>
+            <div>
+              <label className="mb-2 block text-sm text-white/80">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm text-white/80">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                required
+                minLength={6}
+              />
+            </div>
+
+            {error ? (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-white px-4 py-3 font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Creating account..." : "Sign up"}
+            </button>
+          </form>
+        )}
 
         <p className="mt-6 text-sm text-white/60">
           Already have an account?{" "}
