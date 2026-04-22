@@ -3,9 +3,52 @@ import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
 
+const siteUrl = "https://nail-size-detection-y5ms.vercel.app";
+const siteTitle = "Nailytics — AI nail size detection";
+const siteDescription =
+  "Upload a photo and get precise nail measurements in seconds. AI-powered nail size detection for salons, artists, and customers.";
+
 export const metadata: Metadata = {
-  title: "Nailytics",
-  description: "AI nail size detection",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: "%s · Nailytics",
+  },
+  description: siteDescription,
+  applicationName: "Nailytics",
+  keywords: [
+    "nail size detection",
+    "AI nail measurement",
+    "nail length",
+    "nail shape",
+    "manicure tools",
+    "nail salon app",
+  ],
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    siteName: "Nailytics",
+    title: siteTitle,
+    description: siteDescription,
+    images: [
+      {
+        url: "/bg.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nailytics — AI nail size detection",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/bg.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
