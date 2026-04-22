@@ -2,9 +2,10 @@
 
 import { MessageCircle, Send } from "lucide-react";
 import { useState } from "react";
+import TelegramChatModal from "@/components/TelegramChatModal";
 
 export default function ContactPage() {
-  const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+  const [chatOpen, setChatOpen] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,19 +55,16 @@ export default function ContactPage() {
         Questions, partnership ideas, or feedback — we&apos;d love to hear.
       </p>
 
-      {botUsername ? (
-        <div className="mt-10 flex justify-center">
-          <a
-            href={`https://t.me/${botUsername}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-500/10 px-6 py-3 text-sm font-medium text-sky-200 transition hover:bg-sky-500/20 hover:text-white"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Chat on Telegram
-          </a>
-        </div>
-      ) : null}
+      <div className="mt-10 flex justify-center">
+        <button
+          type="button"
+          onClick={() => setChatOpen(true)}
+          className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-500/10 px-6 py-3 text-sm font-medium text-sky-200 transition hover:bg-sky-500/20 hover:text-white"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Chat on Telegram
+        </button>
+      </div>
 
       {sent ? (
         <div className="glass mt-10 p-8 text-center">
@@ -165,6 +163,8 @@ export default function ContactPage() {
           </button>
         </form>
       )}
+
+      <TelegramChatModal open={chatOpen} onClose={() => setChatOpen(false)} />
     </section>
   );
 }
