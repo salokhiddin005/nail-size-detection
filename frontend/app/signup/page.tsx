@@ -23,7 +23,7 @@ export default function SignupPage() {
     const cleanEmail = email.trim().toLowerCase();
     const emailRedirectTo = `${window.location.origin}/login`;
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: cleanEmail,
       password,
       options: {
@@ -38,18 +38,6 @@ export default function SignupPage() {
       setLoading(false);
       setError(error.message);
       return;
-    }
-
-    if (data.user) {
-      const { error: profileError } = await supabase.from("profiles").upsert({
-        id: data.user.id,
-        full_name: cleanName,
-        email: cleanEmail,
-      });
-
-      if (profileError) {
-        console.warn("Profile upsert failed (non-fatal):", profileError.message);
-      }
     }
 
     setSentEmail(cleanEmail);
