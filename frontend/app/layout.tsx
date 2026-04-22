@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const siteUrl = "https://nail-size-detection-y5ms.vercel.app";
 const siteTitle = "Nailytics — AI nail size detection";
@@ -70,6 +71,7 @@ export default function RootLayout({
         <AuthGate>
           <Navbar />
           <div className="relative z-10">{children}</div>
+          <Footer />
         </AuthGate>
       </body>
     </html>
