@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { supabase } from "@/lib/supabase";
 import AuthBackground from "@/components/AuthBackground";
 import PasswordStrengthMeter, {
   evaluatePassword,
 } from "@/components/PasswordStrength";
+
+const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -16,6 +19,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +29,11 @@ export default function SignupPage() {
     const passwordCheck = evaluatePassword(password);
     if (!passwordCheck.valid) {
       setError(`Password needs ${passwordCheck.issues.join(", ")}.`);
+      return;
+    }
+
+    if (HCAPTCHA_SITE_KEY && !captchaToken) {
+      setError("Please complete the captcha first.");
       return;
     }
 
@@ -41,8 +51,12 @@ export default function SignupPage() {
           full_name: cleanName,
         },
         emailRedirectTo,
+        captchaToken: captchaToken ?? undefined,
       },
     });
+
+    captchaRef.current?.resetCaptcha();
+    setCaptchaToken(null);
 
     if (error) {
       setLoading(false);
@@ -117,6 +131,19 @@ export default function SignupPage() {
               />
               <PasswordStrengthMeter password={password} />
             </div>
+
+            {HCAPTCHA_SITE_KEY ? (
+              <div className="flex justify-center">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={HCAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
+              </div>
+            ) : null}
 
             {error ? (
               <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

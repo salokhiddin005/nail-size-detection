@@ -1,28 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { supabase } from "@/lib/supabase";
 import AuthBackground from "@/components/AuthBackground";
+
+const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (HCAPTCHA_SITE_KEY && !captchaToken) {
+      setError("Please complete the captcha first.");
+      return;
+    }
+
+    setLoading(true);
 
     const cleanEmail = email.trim().toLowerCase();
     const redirectTo = `${window.location.origin}/reset-password`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
       redirectTo,
+      captchaToken: captchaToken ?? undefined,
     });
 
+    captchaRef.current?.resetCaptcha();
+    setCaptchaToken(null);
     setLoading(false);
 
     if (error) {
@@ -69,6 +83,19 @@ export default function ForgotPasswordPage() {
                 required
               />
             </div>
+
+            {HCAPTCHA_SITE_KEY ? (
+              <div className="flex justify-center">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={HCAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
+              </div>
+            ) : null}
 
             {error ? (
               <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
