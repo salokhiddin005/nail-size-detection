@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import { Settings, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
@@ -86,13 +86,22 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        <button
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/25 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loggingOut ? "Logging out..." : "Log out"}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            aria-label="Account settings"
+            className="rounded-full border border-white/15 bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/25 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loggingOut ? "Logging out..." : "Log out"}
+          </button>
+        </div>
       </div>
     </header>
   );
