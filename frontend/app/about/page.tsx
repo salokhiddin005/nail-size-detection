@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Page() {
   return (
     <section className="mx-auto max-w-3xl px-6 py-24">
@@ -21,6 +23,14 @@ export default function Page() {
         jewellery, dermatology, and anywhere people need a precise measurement
         without a ruler.
       </p>
+      <div className="mt-10">
+        <Link
+          href="/how-it-works"
+          className="text-sm text-white/70 underline underline-offset-4 transition hover:text-white"
+        >
+          See how it works →
+        </Link>
+      </div>
     </section>
   );
 }
