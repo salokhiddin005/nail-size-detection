@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ToastProvider from "@/components/ToastProvider";
+import ConfirmProvider from "@/components/ConfirmProvider";
 import { Analytics } from "@vercel/analytics/react";
 
 const siteUrl = "https://nail-size-detection-y5ms.vercel.app";
@@ -69,11 +71,15 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-black/70" />
         </div>
 
-        <AuthGate>
-          <Navbar />
-          <div className="relative z-10">{children}</div>
-          <Footer />
-        </AuthGate>
+        <ToastProvider>
+          <ConfirmProvider>
+            <AuthGate>
+              <Navbar />
+              <div className="relative z-10">{children}</div>
+              <Footer />
+            </AuthGate>
+          </ConfirmProvider>
+        </ToastProvider>
         <Analytics />
       </body>
     </html>

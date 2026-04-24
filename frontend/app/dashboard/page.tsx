@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/ConfirmProvider";
+import { useToast } from "@/components/ToastProvider";
 
 type AnalysisResult = {
   id: string | number;
@@ -17,6 +19,8 @@ type AnalysisResult = {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const [userName, setUserName] = useState("");
@@ -95,8 +99,13 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleDelete = async (id: string | number) => {
-    const confirmed = window.confirm("Delete this result?");
-    if (!confirmed) return;
+    const ok = await confirm({
+      title: "Delete this analysis?",
+      description: "This action cannot be undone.",
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
 
     try {
       setDeletingId(id);
@@ -109,8 +118,9 @@ export default function DashboardPage() {
       if (error) throw error;
 
       setResults((prev) => prev.filter((item) => item.id !== id));
+      toast.success("Analysis deleted.");
     } catch (err: any) {
-      alert(err.message || "Failed to delete result.");
+      toast.error(err.message || "Failed to delete result.");
     } finally {
       setDeletingId(null);
     }

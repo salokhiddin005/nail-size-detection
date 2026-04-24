@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/ConfirmProvider";
+import { useToast } from "@/components/ToastProvider";
 
 type GalleryItem = {
   id: string | number;
@@ -19,6 +21,8 @@ type GalleryItem = {
 
 export default function GalleryPage() {
   const router = useRouter();
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [error, setError] = useState("");
@@ -84,9 +88,10 @@ export default function GalleryPage() {
       }
 
       await navigator.clipboard.writeText(url);
-      alert("Image link copied to clipboard.");
+      toast.success("Image link copied to clipboard.");
     } catch (err) {
       console.error("Share failed:", err);
+      toast.error("Could not share. Try downloading instead.");
     }
   };
 
@@ -112,8 +117,13 @@ export default function GalleryPage() {
   };
 
   const handleDelete = async (itemId: string | number) => {
-    const confirmed = window.confirm("Delete this result from your gallery?");
-    if (!confirmed) return;
+    const ok = await confirm({
+      title: "Delete from your gallery?",
+      description: "This action cannot be undone.",
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
 
     try {
       setDeletingId(itemId);
@@ -132,8 +142,10 @@ export default function GalleryPage() {
       if (selectedItem?.id === itemId) {
         setSelectedItem(null);
       }
+
+      toast.success("Deleted from your gallery.");
     } catch (err: any) {
-      alert(err.message || "Failed to delete this item.");
+      toast.error(err.message || "Failed to delete this item.");
     } finally {
       setDeletingId(null);
     }
