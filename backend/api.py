@@ -757,6 +757,7 @@ app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "analysis-images")
 
 # Webcam-only memory for stabilization / fallback
 LAST_GOOD_RESULT = None
@@ -906,6 +907,50 @@ def get_current_user_id_from_supabase(access_token: str) -> str:
     return user_id
 
 
+def upload_image_to_supabase_storage(
+    object_path: str,
+    image_bytes: bytes,
+    content_type: str = "image/jpeg",
+) -> str:
+    """Upload raw image bytes to the Supabase Storage bucket and return its public URL."""
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="Supabase backend environment variables are missing.",
+        )
+
+    upload_url = (
+        f"{SUPABASE_URL}/storage/v1/object/{SUPABASE_STORAGE_BUCKET}/{object_path}"
+    )
+
+    resp = requests.post(
+        upload_url,
+        headers={
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+            "Content-Type": content_type,
+            "x-upsert": "true",
+        },
+        data=image_bytes,
+        timeout=30,
+    )
+
+    if resp.status_code not in (200, 201):
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload image to Supabase Storage: {resp.text}",
+        )
+
+    return f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/{object_path}"
+
+
+def encode_jpeg_bytes(img, quality: int = 88) -> bytes:
+    ok, buf = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, quality])
+    if not ok:
+        raise HTTPException(status_code=500, detail="Failed to encode image as JPEG")
+    return buf.tobytes()
+
+
 def save_analysis_to_supabase(
     user_id: str,
     length_mm: float,
@@ -1048,23 +1093,18 @@ async def analyze(
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
-    original_filename = f"{timestamp}_original.jpg"
-    original_filepath = OUTPUT_DIR / original_filename
-    original_saved_ok = cv2.imwrite(str(original_filepath), frame)
-    if not original_saved_ok:
-        raise HTTPException(status_code=500, detail="Failed to save original image locally")
+    original_object_path = f"{user_id}/{timestamp}_original.jpg"
+    annotated_object_path = f"{user_id}/{timestamp}_annotated.jpg"
 
-    annotated_filename = f"{timestamp}_annotated.jpg"
-    annotated_filepath = OUTPUT_DIR / annotated_filename
-    annotated_saved_ok = cv2.imwrite(str(annotated_filepath), result["annotated"])
-    if not annotated_saved_ok:
-        raise HTTPException(status_code=500, detail="Failed to save annotated image locally")
+    original_image_url = upload_image_to_supabase_storage(
+        original_object_path, encode_jpeg_bytes(frame)
+    )
+    annotated_image_url = upload_image_to_supabase_storage(
+        annotated_object_path, encode_jpeg_bytes(result["annotated"])
+    )
 
-    original_image_path = f"/outputs/{original_filename}"
-    annotated_image_path = f"/outputs/{annotated_filename}"
-
-    original_image_url = make_absolute_output_url(request, original_image_path)
-    annotated_image_url = make_absolute_output_url(request, annotated_image_path)
+    original_image_path = original_object_path
+    annotated_image_path = annotated_object_path
 
     save_analysis_to_supabase(
         user_id=user_id,
