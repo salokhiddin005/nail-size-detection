@@ -334,6 +334,14 @@ export default function GalleryPage() {
                     </button>
 
                     <button
+                      onClick={() => setSelectedItem(null)}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
+                      type="button"
+                    >
+                      Close
+                    </button>
+
+                    <button
                       onClick={() => handleDelete(selectedItem.id)}
                       disabled={deletingId === selectedItem.id}
                       className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 transition hover:bg-red-500/20 disabled:opacity-50"
